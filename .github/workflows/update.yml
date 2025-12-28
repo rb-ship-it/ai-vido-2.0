@@ -8,23 +8,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to update the README
+      contents: write  # Crucial: allows the bot to save files back to your repo
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install deps
+
+      - name: Install dependencies
         run: pip install -r requirements.txt
+
       - name: Run Roast
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python main.py
-- name: Commit and Push changes
+        run: |
+          python main.py
+          ls -la # This lists files in the logs for debugging
+
+      - name: Commit and Push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .  # This packages all new files, including trend_thumb.png
-          git commit -m "🤖 AI updated trends and thumbnail" || echo "No changes to commit"
+          git add . # Important: grabs the new README and the image
+          git commit -m "🤖 AI updated trends and thumbnail" || echo "No changes"
           git push
