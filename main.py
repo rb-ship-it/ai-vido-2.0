@@ -1,27 +1,31 @@
 import os
 import time
-import base64
 from google import genai
+from google.genai import types
 
+# The client automatically finds your GEMINI_API_KEY from the environment
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 def get_funny_trends_and_image():
-    # Use 1.5-flash for the text roast
-    text_prompt = "List 1 trending AI video tech today and write a hilarious one-sentence roast."
-    text_response = client.models.generate_content(model="gemini-1.5-flash", contents=text_prompt)
+    # Use 1.5-flash-latest to avoid the 404 error
+    model_id = "gemini-1.5-flash-latest"
+    
+    # 1. Generate the Roast
+    prompt = "List 1 trending AI video technology today and write a hilarious one-sentence roast."
+    text_response = client.models.generate_content(model=model_id, contents=prompt)
     roast_text = text_response.text
 
-    # Use Nano Banana (2.5-flash-image) for the thumbnail
-    image_prompt = f"A hilarious, high-quality cartoon meme of: {roast_text}. Cinematic lighting, funny style."
+    # 2. Generate the Thumbnail
+    image_prompt = f"A hilarious, high-quality meme image about: {roast_text}. Funny cartoon style."
     print("Generating thumbnail...")
     
     image_response = client.models.generate_content(
-        model="gemini-1.5-flash-latest"", # Use the specialized image model
+        model="gemini-2.0-flash-exp", # Experimental image generation model
         contents=image_prompt,
-        config={"response_modalities": ["IMAGE"]} # Request image output
+        config=types.GenerateContentConfig(response_modalities=["IMAGE"])
     )
 
-    # Save the generated image to your repo
+    # 3. Save the image file
     for part in image_response.parts:
         if part.inline_data:
             with open("trend_thumb.png", "wb") as f:
@@ -31,7 +35,6 @@ def get_funny_trends_and_image():
 
 def update_readme(roast):
     header = "# 🎬 ai-vido-2.0: Daily Funny Trends\n\n"
-    # Display the image in the README using Markdown
     image_md = "![Today's Roast](trend_thumb.png)\n\n" 
     footer = f"\n\n---\n*Last automated update: {time.strftime('%Y-%m-%d %H:%M:%S')}*"
     
@@ -39,5 +42,9 @@ def update_readme(roast):
         f.write(header + image_md + roast + footer)
 
 if __name__ == "__main__":
-    roast = get_funny_trends_and_image()
-    update_readme(roast)
+    try:
+        roast = get_funny_trends_and_image()
+        update_readme(roast)
+        print("Success! Trends and image updated.")
+    except Exception as e:
+        print(f"Error occurred: {e}")
