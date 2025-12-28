@@ -21,10 +21,10 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python main.py
-      - name: Commit changes
+- name: Commit and Push changes
         run: |
-          git config --global user.name 'TrendBot'
-          git config --global user.email 'bot@github.com'
-          git add README.md
-          git commit -m "🤖 AI just roasted the industry" || exit 0
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .  # This packages all new files, including trend_thumb.png
+          git commit -m "🤖 AI updated trends and thumbnail" || echo "No changes to commit"
           git push
