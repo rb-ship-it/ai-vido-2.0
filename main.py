@@ -11,7 +11,7 @@ def get_funny_trends():
     prompt = "Give me 3 trending AI video technologies right now and write a 1-sentence sarcastic/funny roasting of each for my GitHub README."
     
     response = client.models.generate_content(
-        model="gemini-2.0-flash", 
+        model="gemini-1.5-flash", 
         contents=prompt
     )
     
