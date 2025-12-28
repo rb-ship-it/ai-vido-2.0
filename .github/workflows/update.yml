@@ -1,16 +1,16 @@
 name: Daily Roast
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs every night at midnight
-  workflow_dispatch:   # Lets you run it manually for testing
+    - cron: '0 0 * * *' # Runs daily at midnight
+  workflow_dispatch:   # Allows you to trigger it manually
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Crucial: allows the bot to save files back to your repo
+      contents: write # Crucial: Allows the bot to push the image to your repo
     steps:
-      - name: Check out code
+      - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -26,12 +26,12 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python main.py
-          ls -la # This lists files in the logs for debugging
+          ls -la # Lists files in the runner logs to verify trend_thumb.png exists
 
       - name: Commit and Push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add . # Important: grabs the new README and the image
-          git commit -m "🤖 AI updated trends and thumbnail" || echo "No changes"
-          git push
+          git add . # Packages both README.md and trend_thumb.png for delivery
+          git commit -m "🤖 AI generated new roast and image" || echo "No changes to commit"
+          git push # Ships the files to your live repository
