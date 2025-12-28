@@ -16,7 +16,7 @@ def get_funny_trends_and_image():
     print("Generating thumbnail...")
     
     image_response = client.models.generate_content(
-        model="gemini-2.5-flash-image", # Use the specialized image model
+        model="gemini-1.5-flash-latest"", # Use the specialized image model
         contents=image_prompt,
         config={"response_modalities": ["IMAGE"]} # Request image output
     )
